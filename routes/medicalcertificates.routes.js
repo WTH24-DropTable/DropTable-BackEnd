@@ -31,4 +31,7 @@ router.route("/pending")
 router.route("/:id")
     .get(MedicalCertificateController.getUserMedicalCertificates);
 
+router.route("/:id/approve")
+    .get(MedicalCertificateController.updateMedicalCertificateStatus);
+
 export default router;

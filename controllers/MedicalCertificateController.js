@@ -1,5 +1,5 @@
 import firebase from '../firebase.js';
-import { getDocs, setDoc, doc, collection, query, where } from 'firebase/firestore';
+import { getDocs, setDoc, doc, collection, query, where, updateDoc } from 'firebase/firestore';
 import retrieveDataFromMC from '../utils/retrieveDataFromMC.js';
 import uploadImage from '../utils/uploadImage.js';
 import { v4 as uuidv4 } from 'uuid';
@@ -92,8 +92,35 @@ async function getPendingMedicalCertificates(req, res) {
     }
 }
 
+async function updateMedicalCertificateStatus(req, res) {
+    try {
+        const { id } = req.params;
+        const status = req.body.status;
+
+        if (id === undefined || status === undefined) {
+            throw {
+                status: 400,
+                message: "Missing required fields"
+            }
+        }
+
+        const mcRef = doc(firebase.db, "medicalCertificates", id);
+        const updateMC = await updateDoc(mcRef, {
+            "status": status
+        })
+
+        return res.status(200).json({
+            status: "success",
+            updatedMC: updateMC
+        });
+    } catch (err) {
+        return res.status(err.status ? err.status : 500).json({ error: err.message });
+    }
+}
+
 export default {
     uploadMedicalCertificate,
     getUserMedicalCertificates,
-    getPendingMedicalCertificates
+    getPendingMedicalCertificates,
+    updateMedicalCertificateStatus
 }

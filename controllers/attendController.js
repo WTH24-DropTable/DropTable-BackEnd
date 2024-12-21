@@ -23,9 +23,15 @@ const getUserClasses = async (req, res) => {
 
 }
 
+// For a specific lecturer, return all the classes that the lecturer teaches
+const getLecturerClasses = async (req, res) => {
+
+}
+
 export default {
     getAttendanceByClass,
     getClassesAttended,
     markAttendance,
-    getUserClasses
+    getUserClasses,
+    getLecturerClasses
 }

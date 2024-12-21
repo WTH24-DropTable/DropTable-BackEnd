@@ -47,7 +47,8 @@ const createUsersFromMasterSheet = async (req, res) => {
                     email: user[3],
                     password: user[0],
                     role: "student",
-                    classes: []
+                    classes: [],
+                    isNew: true,
                 };
                 createdUsers.push(newUser);
     

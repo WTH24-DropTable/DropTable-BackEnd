@@ -1,5 +1,5 @@
 import firebase from '../firebase.js';
-import { collection, getDocs, getDoc } from 'firebase/firestore';
+import { collection, getDocs, getDoc, Timestamp } from 'firebase/firestore';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -20,6 +20,24 @@ const getAttendance = async (req, res) => {
     }
 }
 
+//Create Attendance
+const createAttendance = async (req, res) => {
+    try {
+        const { studentID, classID, status } = req.body;
+        const docRef = await addDoc(collection(firebase.db, "attendance"), {
+            studentID: studentID,
+            classID: classID,
+            timestamp: new Date().getTime(),
+            status: status
+        });
+        return res.status(201).json({ message: 'attendance created successfully!', attendanceID: docRef.id });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: err.message });
+    }
+}
+
 export default {
-    getAttendance
+    getAttendance,
+    createAttendance
 }

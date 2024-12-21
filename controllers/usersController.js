@@ -38,8 +38,7 @@ async function getStudents(req, res) {
             return res.status(404).json({ message: 'student classes does not exist'});
         }
 
-
-          return res.status(201).json({ message: 'classes returned for student successfully!', students: students });
+        return res.status(201).json({ message: 'classes returned for student successfully!', students: students });
     } catch (err) {
         console.log(err);
         return res.status(500).json({ error: err.message });    
@@ -86,8 +85,9 @@ async function uploadUserImage(req, res) {
         
         const userRef = doc(firebase.db, "users", userId);
         const updatedUser = await updateDoc(userRef, {
-            "profilePic": imageUrl
-        })
+            "profilePic": imageUrl,
+            "isNew": false,
+        });
 
         return res.status(200).json({
             status: "success",
@@ -123,9 +123,18 @@ async function getProfilePictures(req, res) {
     }
 }
 
+async function updatePassword(req, res) {
+    try {
+
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
+}
+
 export default {
     getStudents,
     getStudent,
     uploadUserImage,
-    getProfilePictures
+    getProfilePictures,
+    updatePassword
 }

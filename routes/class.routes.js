@@ -37,4 +37,10 @@ router.route("/:id")
 router.route("/create")
     .post(upload.single("file"), classController.createClass);
 
+router.route("/lecturer/:id")
+    .get(classController.getLecturerClasses);
+
+router.route("/occurances/:id")
+    .get(classController.getClassOccurances);
+
 export default router;

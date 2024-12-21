@@ -99,8 +99,33 @@ async function uploadUserImage(req, res) {
     }
 }
 
+async function getProfilePictures(req, res) {
+    try {
+        const q = query(collection(firebase.db, "users"), where("profilePic", "!=", null));
+        const querySnapshot = await getDocs(q);
+
+        let links = [];
+        querySnapshot.forEach((doc) => {
+            const studentData = doc.data();
+            if (studentData.profilePic) {
+                links.push({ name: studentData.name, imagePath: studentData.profilePic });
+            }
+        });
+
+        if (links.length === 0) {
+            return res.status(404).json({ message: 'No profile pictures found' });
+        }
+
+        return res.status(200).json({ message: 'Profile pictures returned successfully!', links: links });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: err.message });
+    }
+}
+
 export default {
     getStudents,
     getStudent,
-    uploadUserImage
+    uploadUserImage,
+    getProfilePictures
 }

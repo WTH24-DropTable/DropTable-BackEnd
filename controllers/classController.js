@@ -81,8 +81,9 @@ const createClass = async (req, res) => {
         const startDateTime = req.body.startDateTime;
         const duration = req.body.duration;
         const occurance = req.body.occurance;
+        const lessonCount = req.body.lessonCount;
 
-        if (!studentList || !className || !startDateTime || !duration || !occurance) {
+        if (!studentList || !className || !startDateTime || !duration || !occurance || !lessonCount) {
             throw {
                 status: 400,
                 message: "Missing required fields"
@@ -95,6 +96,7 @@ const createClass = async (req, res) => {
             startDateTime: startDateTime,
             duration: duration,
             occurance: occurance,
+            lessonCount: lessonCount,
         }
 
         // Create the class in the database

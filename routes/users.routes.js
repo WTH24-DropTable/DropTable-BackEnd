@@ -34,4 +34,7 @@ router.route("/uploadImage")
 router.route("/profilePic")
     .get(userController.getProfilePictures);
 
+router.route("/:id/updatePassword")
+    .put(userController.updatePassword);
+
 export default router;

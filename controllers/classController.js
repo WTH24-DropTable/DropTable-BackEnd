@@ -2,7 +2,7 @@ import firebase from '../firebase.js';
 import { collection, getDocs, query, where, doc, getDoc, setDoc} from 'firebase/firestore';
 import { parse } from 'csv';
 import fs from 'fs';
-
+import { v4 as uuidv4 } from 'uuid';
 
 // Get classes
 async function getClasses(req, res) {
@@ -58,8 +58,6 @@ async function getStudentClasses(req, res) {
     }
 }
 
-
-
 const parseCSV = (path) => {
     return new Promise((resolve, reject) => {
       const results = {};
@@ -106,10 +104,9 @@ const createClass = async (req, res) => {
         // Parse the CSV
         const results = await parseCSV(studentList.path);
         fs.unlinkSync(studentList.path);
-
         // Loop through all the students in the class, and add the class to their profile
         Object.keys(results).forEach(async (studentId) => {
-            const studentRef = doc(firebase.db, "students", studentId);
+            const studentRef = doc(firebase.db, "users", studentId);
             const studentDoc = await getDoc(studentRef);
             const studentData = studentDoc.data();
             studentData.classes.push(newClass.id);

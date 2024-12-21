@@ -1,4 +1,4 @@
-import classController from "../controllers/classController.js";
+import adminController from "../controllers/adminController.js";
 import express from "express";
 import multer from "multer";
 
@@ -28,10 +28,7 @@ const upload = multer({
 
 const router = express.Router();
 
-router.route("/")
-    .get(classController.getClasses);
-
-router.route("/create")
-    .post(upload.single("file"), classController.createClass);
+router.route("/createUsers")
+    .post(upload.single("file"), adminController.createUsersFromMasterSheet);
 
 export default router;

@@ -1,5 +1,5 @@
 import firebase from '../firebase.js';
-import { collection, setDoc, doc } from 'firebase/firestore';
+import { getDocs, setDoc, doc, collection, query, where } from 'firebase/firestore';
 import retrieveDataFromMC from '../utils/retrieveDataFromMC.js';
 import uploadImage from '../utils/uploadImage.js';
 import { v4 as uuidv4 } from 'uuid';
@@ -44,11 +44,52 @@ async function uploadMedicalCertificate(req, res) {
 }
 
 async function getUserMedicalCertificates(req, res) {
+    try {
+        const userId = req.body.userId;
 
+        if (userId === undefined) {
+            throw {
+                status: 400,
+                message: "Missing required fields"
+            }
+        }
+
+        const mcRef = collection(firebase.db, "medicalCertificates");
+        const collectionQuery = query(mcRef, where("userId", "==", userId));
+        const querySnapshot = await getDocs(collectionQuery);
+        const mcList = [];
+        querySnapshot.forEach((doc) => {
+            mcList.push(doc.data());
+        });
+
+        return res.status(200).json({
+            status: "success",
+            numOfMc: mcList.length,
+            mcList: mcList,
+        });
+    } catch (err) {
+        return res.status(err.status ? err.status : 500).json({ error: err.message });
+    }
 }
 
 async function getPendingMedicalCertificates(req, res) {
+    try {
+        const mcRef = collection(firebase.db, "medicalCertificates");
+        const collectionQuery = query(mcRef, where("status", "==", "pending"));
+        const querySnapshot = await getDocs(collectionQuery);
+        const mcList = [];
+        querySnapshot.forEach((doc) => {
+            mcList.push(doc.data());
+        });
 
+        return res.status(200).json({
+            status: "success",
+            numOfMc: mcList.length,
+            mcList: mcList,
+        });
+    } catch (err) {
+        return res.status(err.status ? err.status : 500).json({ error: err.message });
+    }
 }
 
 export default {

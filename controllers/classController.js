@@ -113,7 +113,6 @@ const createClass = async (req, res) => {
             const studentRef = doc(firebase.db, "users", studentId);
             const studentDoc = await getDoc(studentRef);
             const studentData = studentDoc.data();
-            console.log(studentData);
             studentData.classes.push(newClass.id);
             await setDoc(studentRef, studentData);
         });
@@ -206,10 +205,58 @@ const getClassOccurrences = async (req, res) => {
     }
 }
 
+const getClassAttendance = async (req, res) => {
+    try {
+        const { id, timeslot } = req.params;
+        
+        const attendanceCol = collection(firebase.db, "attendance");
+        const getAttendanceWithClassId = query(attendanceCol, where("classId", "==", id), where("dateTime", "==", Number(timeslot)));
+        const querySnapshot = await getDocs(getAttendanceWithClassId);
+
+        let attendance = [];
+        querySnapshot.forEach((doc) => {
+            attendance = doc.data();
+        });
+
+        return res.status(200).json({
+            status: "success",
+            attendance: attendance
+        });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: err.message });    
+    }
+}
+
+const getStudentsInClass = async (req, res) => {
+    try {
+        const { id } = req.params 
+        
+        const userCol = collection(firebase.db, "users");
+        const getStudentsInClass = query(userCol, where("classes", "array-contains", id), where("role", "==", "student"));
+        const querySnapshot = await getDocs(getStudentsInClass);
+
+        let students = [];
+        querySnapshot.forEach((doc) => {
+            students.push(doc.data());
+        });
+
+        return res.status(200).json({
+            status: "success",
+            students: students
+        });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: err.message });    
+    }
+}
+
 export default { 
     getClasses,
     createClass,
     getStudentClasses,
     getLecturerClasses,
-    getClassOccurrences
+    getClassOccurrences,
+    getStudentsInClass,
+    getClassAttendance
 }

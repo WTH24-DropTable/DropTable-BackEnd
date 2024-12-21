@@ -6,9 +6,7 @@ dotenv.config();
 // For every classId, returns the number of present and not-present users
 const getAttendanceByClass = async (req, res) => {
     try {
-      console.log(req.params)
       const  id  = req.params.classId
-      console.log(id)
         if (!id) {
              return res.status(400).json({ message: 'classId required'});
          }
@@ -17,7 +15,6 @@ const getAttendanceByClass = async (req, res) => {
         querySnapshop.forEach((doc)=>{
           userIds.push(doc.id)
           })
-        console.log(userIds)
 
         querySnapshop= await getDocs(query(collection(firebase.db,'attendance'),where('classId', '==', id)))
         let atttendanceRate=[]
@@ -25,7 +22,6 @@ const getAttendanceByClass = async (req, res) => {
             let attended=[]
             let forgotten=[]
             let attendees=doc.data().attendees
-            console.log(attendees)
             userIds.forEach((user)=>{
               if (attendees.some(e=>e.userId===user)){
                 attended.push(user)

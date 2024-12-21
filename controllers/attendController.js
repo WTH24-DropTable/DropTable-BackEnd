@@ -9,7 +9,6 @@ const getAttendance = async (req, res) => {
         const querySnapshot = await getDocs(collection(firebase.db, "attendance"));
         let attendance = [];
         querySnapshot.forEach((doc) => {
-            console.log(doc);
             attendance.push(doc.data());
         });
 

@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import firebase from '../firebase';
+import firebase from '../firebase.js';
 import { doc, getDoc } from 'firebase/firestore';
 
 const authLoginUser = async (req, res) => {
@@ -15,7 +15,7 @@ const authLoginUser = async (req, res) => {
         }
 
         const userRef = doc(firebase.db, "users", studentId);
-        const user = await getDoc(userRef);
+        const user = (await getDoc(userRef)).data();
 
         // Check if the User Exists
         if (!user) {
@@ -39,6 +39,7 @@ const authLoginUser = async (req, res) => {
             {
                 id: user.id,
                 name: user.name,
+                role: user.role,
             },
             process.env.JWT_SECRET,
             {
@@ -55,6 +56,7 @@ const authLoginUser = async (req, res) => {
             status: "Success",
             message: "Login Successful",
             studentId: user.id,
+            role: user.role,
         });
     } catch (err) {
         console.error(err);

@@ -9,7 +9,6 @@ const getClasses = async (req, res) => {
         const querySnapshot = await getDocs(collection(firebase.db, "class"));
         let classes = [];
         querySnapshot.forEach((doc) => {
-            console.log(doc);
             classes.push(doc.data());
         });
 
@@ -30,7 +29,6 @@ const getClass = async (req, res) => {
 
         const querySnapshot = await getDoc(collection(firebase.db, "class"));
         querySnapshot.forEach((doc) => {
-            console.log(doc);
             classes.push(doc.data());
         });
 

@@ -24,7 +24,6 @@ const createUsersFromMasterSheet = async (req, res) => {
 
         // Parse the CSV
         const parsedData = await parseCSV(masterStudentList.path);
-        console.log(parsedData)
         fs.unlinkSync(masterStudentList.path);
 
         // Check if any of the users already exist
@@ -38,7 +37,7 @@ const createUsersFromMasterSheet = async (req, res) => {
         // Create the users that do not exist
         const createdUsers = [];
         const batchWrite = writeBatch(firebase.db);
-        await parsedData.forEach(async (user) => {
+        for (const user of parsedData) {
             if (!existingUsers.includes(user[0])) {
                 const userDocRef = doc(userRef, user[0]);
                 const newUser = {
@@ -47,16 +46,22 @@ const createUsersFromMasterSheet = async (req, res) => {
                     course: user[2],
                     email: user[3],
                     password: user[0],
+                    role: "student",
                     classes: []
                 };
                 createdUsers.push(newUser);
+    
+                // Hash the password asynchronously
                 const salt = await bcrypt.genSalt(10);
-                const hashedPassword = await bcrypt.hash(newUser["password"], salt);
-                newUser["password"] = hashedPassword;
+                const hashedPassword = await bcrypt.hash(newUser.password, salt);
+                newUser.password = hashedPassword;
+    
+                // Add the user to the batch write
                 batchWrite.set(userDocRef, newUser);
             }
-        });
-
+        }
+    
+        // Commit the batch write
         await batchWrite.commit();
 
         return res.status(200).json({

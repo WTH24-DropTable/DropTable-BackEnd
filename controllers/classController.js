@@ -1,8 +1,9 @@
 import firebase from '../firebase.js';
-import { collection, getDocs, query, where, doc, getDoc, setDoc} from 'firebase/firestore';
+import { collection, getDocs, query, where, doc, getDoc, setDoc, writeBatch} from 'firebase/firestore';
 import { parse } from 'csv';
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
+import generateOccurrences from '../utils/generateOccurances.js';
 
 // Get classes
 async function getClasses(req, res) {
@@ -80,8 +81,9 @@ const createClass = async (req, res) => {
         const duration = req.body.duration;
         const occurance = req.body.occurance;
         const lessonCount = req.body.lessonCount;
+        const lecturerId = req.body.lecturerId;
 
-        if (!studentList || !className || !startDateTime || !duration || !occurance || !lessonCount) {
+        if (!studentList || !className || !startDateTime || !duration || !occurance || !lessonCount || !lecturerId) {
             throw {
                 status: 400,
                 message: "Missing required fields"
@@ -113,6 +115,31 @@ const createClass = async (req, res) => {
             await setDoc(studentRef, studentData);
         });
 
+        // Add to the Lecturer Class List too
+        const lecturerRef = doc(firebase.db, "users", lecturerId);
+        const lecturerDoc = await getDoc(lecturerRef);
+        const lecturerData = lecturerDoc.data();
+        lecturerData.classes.push(newClass.id);
+        await setDoc(lecturerRef, lecturerData);
+
+        // Batch Create Attendance Records
+        const batchWrite = writeBatch(firebase.db);
+        if (occurance !== "oneTime") {
+            const classOccurances = generateOccurrences(startDateTime, occurance, lessonCount);
+            classOccurances.forEach((classOccurance) => {
+                const newAttendance = {
+                    "dateTime": classOccurance,
+                    "classId": newClass.id,
+                    "attendees": []
+                }
+
+                const newAttendanceRef = doc(firebase.db, "attendance", `${newClass.id}-${classOccurance}`);
+                batchWrite.set(newAttendanceRef, newAttendance);
+            })
+        }
+
+        await batchWrite.commit();
+
         newClass["studentList"] = results;
         return res.status(200).json({
             status: "success",
@@ -125,8 +152,60 @@ const createClass = async (req, res) => {
     }
 }
 
+const getLecturerClasses = async (req, res) => {
+    try {
+        const { id } = req.params 
+        
+        const lecturerRef = doc(firebase.db, "users", id);
+        const lecturerDoc = await getDoc(lecturerRef);
+        const lecturerData = lecturerDoc.data();
+        const classIds = lecturerData.classes;
+
+        const lecturerClasses = [];
+        for (let i = 0; i < classIds.length; i++) {
+            const classId = classIds[i];
+            const classRef = doc(firebase.db, "class", classId);
+            const classDoc = await getDoc(classRef);
+            lecturerClasses.push(classDoc.data());
+        }
+
+        return res.status(200).json({
+            status: "success",
+            classes: lecturerClasses
+        });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: err.message });    
+    }
+}
+
+const getClassOccurances = async (req, res) => {
+    try {
+        const { id } = req.params 
+        
+        const attendanceCol = collection(firebase.db, "attendance");
+        const getAttendanceWithClassId = query(attendanceCol, where("classId", "==", id));
+        const querySnapshot = await getDocs(getAttendanceWithClassId);
+
+        let occurances = [];
+        querySnapshot.forEach((doc) => {
+            occurances.push(doc.data());
+        });
+
+        return res.status(200).json({
+            status: "success",
+            occurances: occurances
+        });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: err.message });    
+    }
+}
+
 export default { 
     getClasses,
     createClass,
-    getStudentClasses
+    getStudentClasses,
+    getLecturerClasses,
+    getClassOccurances
 }

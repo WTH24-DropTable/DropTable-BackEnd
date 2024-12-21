@@ -1,4 +1,4 @@
-import MedicalCertificateController from "../controllers/MedicalCertificateController";
+import MedicalCertificateController from "../controllers/MedicalCertificateController.js";
 import express from "express";
 import multer from "multer";
 

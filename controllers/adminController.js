@@ -1,5 +1,6 @@
 import firebase from '../firebase.js';
 import { collection, getDocs, doc, writeBatch, query, where } from 'firebase/firestore';
+import bcrypt from 'bcryptjs';
 import { parse } from 'csv';
 import fs from 'fs';
 
@@ -37,7 +38,7 @@ const createUsersFromMasterSheet = async (req, res) => {
         // Create the users that do not exist
         const createdUsers = [];
         const batchWrite = writeBatch(firebase.db);
-        parsedData.forEach((user) => {
+        await parsedData.forEach(async (user) => {
             if (!existingUsers.includes(user[0])) {
                 const userDocRef = doc(userRef, user[0]);
                 const newUser = {
@@ -48,8 +49,11 @@ const createUsersFromMasterSheet = async (req, res) => {
                     password: user[0],
                     classes: []
                 };
-                batchWrite.set(userDocRef, newUser);
                 createdUsers.push(newUser);
+                const salt = await bcrypt.genSalt(10);
+                const hashedPassword = await bcrypt.hash(newUser["password"], salt);
+                newUser["password"] = hashedPassword;
+                batchWrite.set(userDocRef, newUser);
             }
         });
 

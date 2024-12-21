@@ -6,6 +6,9 @@ const router = Router();
 router.route("/mark")
     .post(attendController.markAttendance);
 
+router.route("/createAttendance")
+    .post(attendController.createAttendance);
+
 router.route("/:classId")
     .get(attendController.getAttendanceByClass);
 

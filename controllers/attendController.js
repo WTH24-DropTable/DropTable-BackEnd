@@ -32,7 +32,7 @@ const getAttendanceByClass = async (req, res) => {
             let cur={
               occuranceId:doc.id,
               "attended":attended,
-              "forgotten":forgotten
+              "abscent":forgotten
             }
             atttendanceRate.push(cur)
           })
@@ -49,7 +49,22 @@ const getAttendanceByClass = async (req, res) => {
 
 // For a specific userId, returns the classes that the user attended, and the classes that the user missed
 const getClassesAttended = async (req, res) => {
-
+        
+      const  id  = req.params.classId
+      const  userId= req.params.userId
+        let querySnapshop= await getDocs(query(collection(firebase.db,'attendance'),where('classId', '==', id)))
+        let attended=[]
+        let forgortten=[]
+        querySnapshop.forEach((doc)=>{
+            let attendees=doc.data().attendees
+            console.log(attendees)
+              if (attendees.some(e=>e.userId===userId)){
+                attended.push(doc.id)
+              }else{
+                forgortten.push(doc.id)
+              }
+            })
+        return res.status(200).json({"attended":attended,"absent":forgortten})
 }
 
 // For a specific classId, mark a User Present / Late

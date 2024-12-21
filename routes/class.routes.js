@@ -28,14 +28,13 @@ const upload = multer({
 
 const router = express.Router();
 
-router.route("/class/:classid")
 router.route("/")
     .get(classController.getClasses);
 
+router.route("/:id")
+    .get(classController.getStudentClasses);
+
 router.route("/create")
     .post(upload.single("file"), classController.createClass);
-
-router.route("/:id")
-    .get(classController.getStudentClasses)
 
 export default router;

@@ -25,14 +25,14 @@ const router = express.Router();
 router.route("/students")
     .get(userController.getStudents);
 
-router.route("/students/:id")
-    .get(userController.getStudent);
-
 router.route("/uploadImage")
     .post(upload.single("profilePic"), userController.uploadUserImage);
 
 router.route("/profilePic")
     .get(userController.getProfilePictures);
+
+router.route("/:id")
+    .get(userController.getUser);
 
 router.route("/:id/updatePassword")
     .put(userController.updatePassword);

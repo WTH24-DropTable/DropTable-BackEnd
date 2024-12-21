@@ -76,6 +76,7 @@ const parseCSV = (path) => {
 const createClass = async (req, res) => {
     try {
         const studentList = req.file;
+        const name = req.body.name;
         const className = req.body.className;
         const startDateTime = req.body.startDateTime;
         const duration = req.body.duration;
@@ -83,7 +84,7 @@ const createClass = async (req, res) => {
         const lessonCount = req.body.lessonCount;
         const lecturerId = req.body.lecturerId;
 
-        if (!studentList || !className || !startDateTime || !duration || !occurance || !lessonCount || !lecturerId) {
+        if (!studentList || !className || !name || !startDateTime || !duration || !occurance || !lessonCount || !lecturerId) {
             throw {
                 status: 400,
                 message: "Missing required fields"
@@ -92,6 +93,7 @@ const createClass = async (req, res) => {
 
         const newClass = {
             id: uuidv4(),
+            name: name,
             className: className,
             startDateTime: startDateTime,
             duration: duration,
@@ -111,6 +113,7 @@ const createClass = async (req, res) => {
             const studentRef = doc(firebase.db, "users", studentId);
             const studentDoc = await getDoc(studentRef);
             const studentData = studentDoc.data();
+            console.log(studentData);
             studentData.classes.push(newClass.id);
             await setDoc(studentRef, studentData);
         });
@@ -125,12 +128,13 @@ const createClass = async (req, res) => {
         // Batch Create Attendance Records
         const batchWrite = writeBatch(firebase.db);
         if (occurance !== "oneTime") {
-            const classOccurances = generateOccurrences(startDateTime, occurance, lessonCount);
+            const classOccurances = generateOccurrences(Number(startDateTime), occurance, lessonCount);
             classOccurances.forEach((classOccurance) => {
                 const newAttendance = {
-                    "dateTime": classOccurance,
+                    "dateTime": Number(classOccurance),
                     "classId": newClass.id,
-                    "attendees": []
+                    "attendees": [],
+                    "expectedAttendees": Object.keys(results).length
                 }
 
                 const newAttendanceRef = doc(firebase.db, "attendance", `${newClass.id}-${classOccurance}`);
@@ -179,7 +183,7 @@ const getLecturerClasses = async (req, res) => {
     }
 }
 
-const getClassOccurances = async (req, res) => {
+const getClassOccurrences = async (req, res) => {
     try {
         const { id } = req.params 
         
@@ -194,7 +198,7 @@ const getClassOccurances = async (req, res) => {
 
         return res.status(200).json({
             status: "success",
-            occurances: occurances
+            occurrences: occurances
         });
     } catch (err) {
         console.log(err);
@@ -207,5 +211,5 @@ export default {
     createClass,
     getStudentClasses,
     getLecturerClasses,
-    getClassOccurances
+    getClassOccurrences
 }

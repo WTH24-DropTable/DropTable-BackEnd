@@ -107,6 +107,7 @@ async function getProfilePictures(req, res) {
         let links = [];
         querySnapshot.forEach((doc) => {
             const studentData = doc.data();
+            console.log(studentData)
             if (studentData.profilePic) {
                 links.push({ name: studentData.name, imagePath: studentData.profilePic });
             }

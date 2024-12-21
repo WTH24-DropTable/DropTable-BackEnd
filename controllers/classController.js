@@ -10,6 +10,7 @@ async function getClasses(req, res) {
         const querySnapshot = await getDocs(collection(firebase.db, "class"));
         let classes = [];
         querySnapshot.forEach((doc) => {
+            console.log(doc);
             classes.push(doc.data());
         });
 
@@ -39,14 +40,10 @@ async function getStudentClasses(req, res) {
         }
        
 
-        // --- get all classes and return only student classes --- //
-        const classSnapshot = await getDocs(collection(firebase.db, "class"))
-        let classes = [];
-        classSnapshot.forEach((doc) => {
-            // console.log(doc);
-            if (doc.data().id in docSnap.data().classes) {
-                classes.push(doc.data());
-            }
+        const querySnapshot = await getDoc(collection(firebase.db, "class"));
+        querySnapshot.forEach((doc) => {
+            console.log(doc);
+            classes.push(doc.data());
         });
 
         if (classes.length == 0) {
@@ -54,7 +51,7 @@ async function getStudentClasses(req, res) {
         }
 
 
-        return res.status(201).json({ message: 'classes returned for student successfully!', classes: classes });
+          return res.status(201).json({ message: 'classes returned successfully!', classes: classes });
     } catch (err) {
         console.log(err);
         return res.status(500).json({ error: err.message });    

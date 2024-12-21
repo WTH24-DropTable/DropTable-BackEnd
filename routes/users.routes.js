@@ -31,4 +31,7 @@ router.route("/students/:id")
 router.route("/uploadImage")
     .post(upload.single("profilePic"), userController.uploadUserImage);
 
+router.route("/profilePic")
+    .get(userController.getProfilePictures);
+
 export default router;

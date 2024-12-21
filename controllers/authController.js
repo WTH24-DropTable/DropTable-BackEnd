@@ -55,7 +55,7 @@ const authLoginUser = async (req, res) => {
         res.status(200).json({
             status: "Success",
             message: "Login Successful",
-            studentId: user.id,
+            id: user.id,
             role: user.role,
         });
     } catch (err) {

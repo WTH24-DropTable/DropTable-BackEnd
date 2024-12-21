@@ -45,8 +45,8 @@ async function uploadMedicalCertificate(req, res) {
 
 async function getUserMedicalCertificates(req, res) {
     try {
-        const userId = req.body.userId;
-
+        const userId = req.params.id;
+        
         if (userId === undefined) {
             throw {
                 status: 400,

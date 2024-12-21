@@ -1,5 +1,6 @@
 import firebase from '../firebase.js';
-import { collection, getDocs, getDoc, doc} from 'firebase/firestore';
+import { collection, getDocs, getDoc, doc, updateDoc, query, where } from 'firebase/firestore';
+import uploadImage from '../utils/uploadImage.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -12,7 +13,7 @@ async function getStudents(req, res) {
             return res.status(404).json({ message: 'please enter a class'});
         }
 
-        const docRef = doc(firebase.db, "class", classId );
+        const docRef = doc(firebase.db, "class", classId);
         const docSnap = await getDoc(docRef);
 
         // console.log("snapshot class:\n\n ", docSnap.data());
@@ -54,16 +55,44 @@ async function getStudent(req, res) {
             return res.status(404).json({ message: 'please enter an id'});
         }
 
-        const docRef = doc(firebase.db, "student", id );
+        const docRef = doc(firebase.db, "users", id);
         const docSnap = await getDoc(docRef);
 
-        // console.log("snapshot class:\n\n ", docSnap.data());
         if (!docSnap) {
-            return res.status(404).json({ message: 'class does not exist'});
+            return res.status(404).json({ message: 'student does not exist'});
         }
         const student = docSnap.data()
-        return res.status(201).json({ message: 'student returned successfully!', student: student });
+        return res.status(200).json({ message: 'student returned successfully!', student: student });
 
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: err.message });    
+    }
+}
+
+async function uploadUserImage(req, res) {
+    try {
+        const userImage = req.file;
+        const userId = req.body.userId;
+
+        if (userId === undefined) {
+            throw {
+                status: 400,
+                message: "Missing required fields"
+            }
+        }
+
+        const imageUrl = await uploadImage(userImage, "profilepic", userId);
+        
+        const userRef = doc(firebase.db, "users", userId);
+        const updatedUser = await updateDoc(userRef, {
+            "profilePic": imageUrl
+        })
+
+        return res.status(200).json({
+            status: "success",
+            updatedUser: updatedUser,
+        });
     } catch (err) {
         console.log(err);
         return res.status(500).json({ error: err.message });    
@@ -72,5 +101,6 @@ async function getStudent(req, res) {
 
 export default {
     getStudents,
-    getStudent
+    getStudent,
+    uploadUserImage
 }

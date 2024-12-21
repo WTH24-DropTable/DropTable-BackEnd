@@ -25,8 +25,8 @@ const router = express.Router();
 router.route("/students")
     .get(userController.getStudents);
 
-router.route("/students/:id")
-    .get(userController.getStudent);
+router.route("/:id")
+    .get(userController.getUser);
 
 router.route("/uploadImage")
     .post(upload.single("profilePic"), userController.uploadUserImage);

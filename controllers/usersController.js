@@ -46,7 +46,7 @@ async function getStudents(req, res) {
 }
 
 // get user by id
-async function getStudent(req, res) {
+async function getUser(req, res) {
     try {
         const { id } = req.params;
 
@@ -58,7 +58,7 @@ async function getStudent(req, res) {
         const docSnap = await getDoc(docRef);
 
         if (!docSnap) {
-            return res.status(404).json({ message: 'student does not exist'});
+            return res.status(404).json({ message: 'user does not exist'});
         }
         const student = docSnap.data()
         return res.status(200).json({ message: 'student returned successfully!', student: student });
@@ -133,7 +133,7 @@ async function updatePassword(req, res) {
 
 export default {
     getStudents,
-    getStudent,
+    getUser,
     uploadUserImage,
     getProfilePictures,
     updatePassword

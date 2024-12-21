@@ -40,7 +40,7 @@ router.route("/create")
 router.route("/lecturer/:id")
     .get(classController.getLecturerClasses);
 
-router.route("/occurances/:id")
-    .get(classController.getClassOccurances);
+router.route("/occurrences/:id")
+    .get(classController.getClassOccurrences);
 
 export default router;

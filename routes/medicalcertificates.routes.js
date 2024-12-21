@@ -25,10 +25,11 @@ const router = express.Router();
 router.route("/upload")
     .post(upload.single("mc"), MedicalCertificateController.uploadMedicalCertificate);
 
+router.route("/pending")
+    .get(MedicalCertificateController.getPendingMedicalCertificates);
+    
 router.route("/:id")
     .get(MedicalCertificateController.getUserMedicalCertificates);
 
-router.route("/pending")
-    .get(MedicalCertificateController.getPendingMedicalCertificates);
 
 export default router;

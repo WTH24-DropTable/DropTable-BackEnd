@@ -32,7 +32,14 @@ router.route("/")
     .get(classController.getClasses);
 
 router.route("/:id")
-    .get(classController.getStudentClasses);
+    .get(classController.getClassById);
+    // .get(classController.getStudentClasses);
+
+router.route("/:id/students")
+    .get(classController.getStudentsInClass);
+
+router.route("/:id/attendance/:timeslot")
+    .get(classController.getClassAttendance);
 
 router.route("/class/:id")
     .get(classController.getClassbyId);

@@ -6,9 +6,7 @@ dotenv.config();
 // For every classId, returns the number of present and not-present users
 const getAttendanceByClass = async (req, res) => {
     try {
-      console.log(req.params)
       const  id  = req.params.classId
-      console.log(id)
         if (!id) {
              return res.status(400).json({ message: 'classId required'});
          }
@@ -17,7 +15,6 @@ const getAttendanceByClass = async (req, res) => {
         querySnapshop.forEach((doc)=>{
           userIds.push(doc.id)
           })
-        console.log(userIds)
 
         querySnapshop= await getDocs(query(collection(firebase.db,'attendance'),where('classId', '==', id)))
         let atttendanceRate=[]
@@ -25,7 +22,6 @@ const getAttendanceByClass = async (req, res) => {
             let attended=[]
             let forgotten=[]
             let attendees=doc.data().attendees
-            console.log(attendees)
             userIds.forEach((user)=>{
               if (attendees.some(e=>e.userId===user)){
                 attended.push(user)
@@ -74,8 +70,9 @@ const getClassesAttended = async (req, res) => {
 // For a specific classId, mark a User Present / Late
 const markAttendance = async (req, res) => {
     let userId=req.body.userId
-    let classId=req.body.occuranceId
+    let occuranceId=req.body.occuranceId
     let stat=req.body.stat
+    let classId = occuranceId.split('-')[0];
     if (!stat ||!userId ||!classId){
       res.status(400).json({message:'occuranceId and stat and userId required'})
     }
@@ -84,17 +81,38 @@ const markAttendance = async (req, res) => {
       "status":stat
     }
 
+    try {
+        // Get students in class
+        const userCol = collection(firebase.db, "users");
+        const getStudentsInClass = query(userCol, where("classes", "array-contains", classId), where("role", "==", "student"));
+        const querySnapshot = await getDocs(getStudentsInClass);
+
+        let students = [];
+        querySnapshot.forEach((doc) => {
+            students.push(doc.data());
+        });
+
+        if (!students.some(student => student.id === userId)) {
+            return res.status(400).json({ message: 'Student not in class' });
+        }
+
+        // Update attendance
+        let arrUnion = await updateDoc(doc(firebase.db, 'attendance', occuranceId), {
+            attendees: arrayUnion(newEntry)
+        });
+        return res.status(200).json({ message: arrUnion });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: err.message });
+    }
+
 //    let attendanceRef= await getDocs(query(collection(firebase.db,'attendance'),where('classId', '==', classId)))
 //    let attendanceId;
-//    attendanceRef.forEach((doc)=>{
+//    attendanceRef.forEach((doc)=>{  
 //     attendanceId=doc.id })
 //    if (!attendanceId){
 //      res.status(400).json({message:'please input valid classId'})
 //    }
-    let arrUnion=await updateDoc(doc(firebase.db,'attendance',classId),{
-      attendees:arrayUnion(newEntry)
-    })
-    res.status(200).json({message:arrUnion})
 
 }
 

@@ -23,7 +23,7 @@ async function getClasses(req, res) {
 }
 
 
-async function getClassbyId(req, res) {
+async function getClassById(req, res) {
     try {
         const { id } = req.params 
         if (!id) {
@@ -277,10 +277,9 @@ export default {
     getClasses,
     createClass,
     getStudentClasses,
-    getClassbyId,
+    getClassById,
     getLecturerClasses,
     getClassOccurrences,
     getStudentsInClass,
     getClassAttendance,
-    getClassById
 }

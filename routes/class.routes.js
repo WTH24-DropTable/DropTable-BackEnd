@@ -32,7 +32,8 @@ router.route("/")
     .get(classController.getClasses);
 
 router.route("/:id")
-    .get(classController.getStudentClasses);
+    .get(classController.getClassById);
+    // .get(classController.getStudentClasses);
 
 router.route("/:id/students")
     .get(classController.getStudentsInClass);

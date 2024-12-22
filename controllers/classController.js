@@ -22,6 +22,27 @@ async function getClasses(req, res) {
     }
 }
 
+async function getClassById(req, res) {
+    try {
+        const { id } = req.params 
+        if (!id) {
+            return res.status(400).json({ message: 'class id required'});
+        }
+
+        const docRef = doc(firebase.db, "class", id);
+        const docSnap = await getDoc(docRef);
+        
+        if (!docSnap) {
+            return res.status(404).json({ message: 'class does not exist'});
+        }
+
+        return res.status(200).json({ message: 'class returned successfully!', class: docSnap.data() });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: err.message });    
+    }
+}
+
 // Get Classes by student id
 async function getStudentClasses(req, res) {
     try {
@@ -258,5 +279,6 @@ export default {
     getLecturerClasses,
     getClassOccurrences,
     getStudentsInClass,
-    getClassAttendance
+    getClassAttendance,
+    getClassById
 }

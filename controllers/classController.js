@@ -21,7 +21,18 @@ async function getClasses(req, res) {
         return res.status(500).json({ error: err.message });    
     }
 }
-
+async function getClassbyId(req, res) {
+    try {
+        const {id}=req.params
+        console.log(id)
+        const querySnapshot = await getDoc(doc(firebase.db,'class',id));
+        console.log(querySnapshot.data())
+          return res.status(201).json({ message: 'classes returned successfully!', classes: querySnapshot.data()});
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: err.message });    
+    }
+}
 // Get Classes by student id
 async function getStudentClasses(req, res) {
     try {
@@ -210,6 +221,7 @@ export default {
     getClasses,
     createClass,
     getStudentClasses,
+    getClassbyId,
     getLecturerClasses,
     getClassOccurrences
 }

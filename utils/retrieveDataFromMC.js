@@ -8,17 +8,22 @@ const client = new OpenAI({
 })
 
 const systemPrompt =  `
-    Read the Medical Certificate, and provide the following information in the order of:
-    1. Patient Name
-    2. Start Date of the Medical Certificate but convert it to UNIX time in Miliseconds
-    3. Duration of the Medical Certificate
-    4. Clinic Name
-    The format should be: 'John Doe, 1640995200000, 7, Medical Clinic' FOLLOW IT EXACTLY, NO TEXT FORMATTING.
+Provide the following details from a Medical Certificate (MC) in the exact format: Patient Name, Start Date in UNIX time (milliseconds), Duration in days, Clinic Name.
+
+Instructions:
+Extract the Patient Name. If there is a comma in the name, omit it.
+Convert the Start Date (given as dd/mm/yyyy in the MC) to UNIX time in milliseconds.
+Extract the Duration of the MC in days.
+Extract the Clinic Name.
+Output Example:
+John Doe, 1640995200000, 7, Medical Clinic
+
+Ensure the format is followed precisely without additional text or formatting.
 `;
 
 export default async function retrieveDataFromMC(medicalCertUrl) {
     const data = await client.chat.completions.create({
-        model: "gpt-4o-mini",
+        model: "gpt-4o",
         messages: [
             {
                 role: "system",

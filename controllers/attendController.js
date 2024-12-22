@@ -72,7 +72,7 @@ const markAttendance = async (req, res) => {
     let userId=req.body.userId
     let occuranceId=req.body.occuranceId
     let stat=req.body.stat
-    let classId = occuranceId.split('-')[0];
+    let classId = req.body.classId;
     if (!stat ||!userId ||!classId){
       res.status(400).json({message:'occuranceId and stat and userId required'})
     }
@@ -83,14 +83,17 @@ const markAttendance = async (req, res) => {
 
     try {
         // Get students in class
+        console.log(classId)
         const userCol = collection(firebase.db, "users");
         const getStudentsInClass = query(userCol, where("classes", "array-contains", classId), where("role", "==", "student"));
         const querySnapshot = await getDocs(getStudentsInClass);
 
         let students = [];
         querySnapshot.forEach((doc) => {
+          console.log(doc.data())
             students.push(doc.data());
         });
+
 
         if (!students.some(student => student.id === userId)) {
             return res.status(400).json({ message: 'Student not in class' });

@@ -41,6 +41,8 @@ router.route("/:id/students")
 router.route("/:id/attendance/:timeslot")
     .get(classController.getClassAttendance);
 
+router.route("/class/:id")
+    .get(classController.getClassById);
 router.route("/create")
     .post(upload.single("file"), classController.createClass);
 

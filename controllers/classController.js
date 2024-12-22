@@ -22,6 +22,7 @@ async function getClasses(req, res) {
     }
 }
 
+
 async function getClassById(req, res) {
     try {
         const { id } = req.params 
@@ -36,7 +37,7 @@ async function getClassById(req, res) {
             return res.status(404).json({ message: 'class does not exist'});
         }
 
-        return res.status(200).json({ message: 'class returned successfully!', class: docSnap.data() });
+        return res.status(200).json({ message: 'class returned successfully!', 'class': docSnap.data() , classes: docSnap.data()});
     } catch (err) {
         console.log(err);
         return res.status(500).json({ error: err.message });    
@@ -276,9 +277,9 @@ export default {
     getClasses,
     createClass,
     getStudentClasses,
+    getClassById,
     getLecturerClasses,
     getClassOccurrences,
     getStudentsInClass,
     getClassAttendance,
-    getClassById
 }
